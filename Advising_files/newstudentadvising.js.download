@@ -1,0 +1,1601 @@
+var delete_second_course = 0;//CODE FOR AMC
+
+
+var systemWorking = false;
+var studentID = "";
+var studentInfoLoaded = false;
+var advisedArray = new Array();
+var feesArray = new Array();
+var timeConflict = new Array();
+var specialCourses = new Array();
+var mandatoryCourses = new Array();
+var restrictRetake = new Array();
+var restrictRetake1 = new Array();
+var restrictR1 = new Array();
+
+
+var totalCourseAdvised = 0;
+var totalCreditAdvised = 0;
+var color0 = "#EAEBEB"
+var color1 = "#F4071D";
+var color2 = "#6C8AD6";
+var color3 = "#E3F454";
+var color4 = "#91F8A0";
+var color5 = "#FF6347";
+var saving = false;
+
+var msgID = 0;
+var doingAdvising = false;
+var reAdvising = 0;
+
+var advObj = new advisedObj("", 0, 0, 0, 0, 0, 0, 0, 0);
+advisedArray.push(advObj);
+
+var feeObj = new feesObj("", 0, "");
+feesArray.push(feeObj);
+
+var confObj = new timeObj("", 0, 0);
+timeConflict.push(confObj);
+
+var spcObj = new specialObj("", "", "", "", "", "", "","","");
+specialCourses.push(spcObj);
+
+var mandatoryObj = new mandatoryCourseObj("");
+mandatoryCourses.push(mandatoryObj);
+
+var restrictObj = new restrictCourseObj("", "");
+restrictRetake.push(restrictObj);
+
+var restrictObj1 = new restrictCourseObj1("", "");
+restrictRetake1.push(restrictObj1);
+
+var rObj1 = new restrictCO1("", "");
+restrictR1.push(rObj1);
+
+
+
+function advisedObj(im, courseid, section, credit, timeid, fees, finalexamstart, finalexamend, status) {
+    this.courseTitle = im;
+    this.courseCode = courseid;
+    this.section = section;
+    this.courseCredit = credit;
+    this.timeID = timeid;
+    this.fees = fees;
+    this.finalExamStart = finalexamstart;
+    this.finalExamEnd = finalexamend;
+    this.status = status;
+}
+
+function feesObj(title, amount, course) {
+    this.title = title;
+    this.amount = amount;
+    this.course = course;
+}
+
+function timeObj(timeID, startMin, endMin) {
+    this.timeID = timeID;
+    this.startMin = startMin;
+    this.endMin = endMin;
+}
+
+function specialObj(courseCode, maxCredit, minCredit, program, programName, minCGPA, allowedBatches,allowedStudents,allowedSection) {
+    this.courseCode = courseCode;
+    this.maxCredit = maxCredit;
+    this.minCredit = minCredit;
+    this.program = program;
+    this.programName = programName;
+    this.minCGPA = minCGPA;
+    this.allowedBatches = allowedBatches;
+    this.allowedStudents = allowedStudents;
+    this.allowedSection = allowedSection;
+}
+
+function mandatoryCourseObj(courseCode) {
+    this.courseCode = courseCode;
+}
+
+function restrictCourseObj(courseCode, takenCount) {
+    this.courseCode = courseCode;
+    this.takenCount = takenCount;
+
+}
+
+function restrictCourseObj1(courseCode, takenCount) {
+    this.courseCode = courseCode;
+    this.takenCount = takenCount;
+
+}
+
+function restrictCO1(courseCode, CGPA) {
+    this.courseCode = courseCode;
+    this.CGPA = CGPA;
+
+}
+
+
+/*
+ status color information:
+ 0 => course can be taken. 
+ 1 => section full
+ 2 => prereq not done
+ 3 => already advised. 
+ 4 => already completed.
+ */
+
+
+
+showLoading = function () {
+    jQuery(".advmsg-overlay").css('display', 'block');
+    startWaiting();
+    return false;
+};
+
+hideLoading = function () {
+    jQuery(".advmsg-overlay").css('display', 'none');
+    jQuery("#waiting").countdown('destroy');
+    return false;
+};
+
+
+defletAll = function () {
+
+    // remark the courses for done and advised courses. then delete
+    var advCourses = advisedArray.length;
+    for (var i = 1; i < advCourses; i++)
+    {
+        var fin = findCourseIndex(advisedArray[i].courseCode, advisedArray[i].section);
+
+        var tstatus = 0;
+
+        if (courseArray[fin].totalSeat == courseArray[fin].advised)
+            tstatus = 1;
+
+        courseArray[fin].status = tstatus;
+    }
+
+    var doneCourses = studentCourses.length;
+    for (var i = 1; i < doneCourses; i++)
+    {
+        demarkAllSection(studentCourses[i].courseCode);
+    }
+
+
+    studentSemester.splice(1, studentSemester.length);
+    studentCourses.splice(1, studentCourses.length);
+    advisedArray.splice(1, advisedArray.length);
+    studentPreReqArray.splice(1, studentPreReqArray.length);
+    preCourseArray.splice(1, preCourseArray.length);
+    studentID = "";
+    totalCourseAdvised = 0;
+    totalCreditAdvised = 0;
+    reAdvising = 0;
+    studentInfoLoaded = false;
+    $('#advSlip').empty();
+    $('#transcriptDiv').empty();
+    $('#graphDiv').empty();
+    $('#studentName').empty();
+    $('#crcgpa').empty();
+    doingAdvising = false;
+};
+
+// For backtracking to the advising window
+
+
+discardadv = function () {
+    showLoading();
+    Boxy.ask("<h4 style=\"color:green;\">Are you sure to discard the changes?</h4>", ['Yes', 'Cancel'],
+        function (val) {
+            if (val === 'Yes') {
+                window.location = sitePath + "/students/advising";
+            } else {
+                hideLoading();
+            }
+        }, {title: "Please Confirm"}
+    );
+    return false;
+};
+
+
+checkPreReqDone = function () {
+    var preReqCourses = preCourseArray.length;
+    for (var i = 1; i < preReqCourses; i++)
+    {
+        if (preCourseArray[i].courseGP == null || preCourseArray[i].courseGP == 0) {
+            markAllSection(preCourseArray[i].courseCode, 2);
+        }
+    }
+};
+
+nsuAlert = function (msg) {
+    var newDialog = Boxy.generalalert("<h4 style='color:darkgreen;'>"+msg+"</h4>", null, {title: 'Message'});
+    //alert(msg);
+};
+
+nsuAlertWarning = function (msg) {
+    var newDialog = Boxy.generalalert("<h4 style='color:red;'>"+msg+"</h4>", null, {title: 'WARNING!!'});
+    //alert(msg);
+};
+
+
+
+
+
+findCoursePosition = function (course, low, high, found) {
+    var mid = (low + high) >> 1;
+
+    if (mid == low || mid == high) {
+        return found;
+    }
+
+    //alert(low+" > "+high+" > "+mid+" > "+coursePosition[mid])
+
+    if (coursePosition[mid].substr(0, course.length) > course)
+        return findCoursePosition(course, low, mid, found);
+    else
+    if (coursePosition[mid].substr(0, course.length) < course)
+        return findCoursePosition(course, mid, high, found);
+    else
+        return findCoursePosition(course, low, mid, mid);
+};
+
+findCourseIndex = function (course) {
+    var start = findCoursePosition(course, 0, coursePosition.length, -1);
+
+    return start;
+};
+
+
+takeToCourse = function () {
+    var searchText = $('#searchText').val().toUpperCase();
+
+    var tmp = searchText.split(".");
+    var course = "";
+    var section = 0;
+    if (tmp.length == 1 && tmp[0].length > 5) {
+        course = tmp[0];
+        section = 1;
+    } else if (tmp.length == 1) {
+        course = searchText;
+        section = "";
+    } else if (tmp.length == 2) {
+        if (tmp[0].length > 5)
+            course = tmp[0];
+        section = tmp[1] * 1;
+    }
+
+    var ind = findCourseIndex(course + "" + section);
+
+    var height = $(".cstat0").outerHeight(true);
+
+    $('#offeredCourses').scrollTop((ind) * height);
+};
+
+removeCourse = function (course, section) {
+
+    //remove for load testing :START
+
+    var value = document.getElementById("studentName").innerText;
+    var splitValue = value.split('-');
+    splitValue = splitValue[1].slice(-2);
+
+    //remove for load testing :END
+    //if(course.startsWith('PHR') && splitValue == 46){
+    //alert("You can't remove this course");
+    //return false;
+    //}
+
+
+    //CODE START FOR AMC
+
+    if (delete_second_course == 0)
+    {
+                                                        //var conf = confirm("Are you sure to remove this course?");//old code
+        Swal.fire({
+            title: "<span style='color:red'>Drop this course?<span>",
+            text: "You may not be able to revert!",
+            width: '30%',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, drop it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                var advCourses = advisedArray.length;
+
+                for (var i = 1; i < advCourses; i++)
+                {
+                    var advitem = advisedArray[i];
+                    if (advitem.courseCode == course) {
+
+                        if (checkIfSpecialCourse(course)) {
+                            maxCreditAllowed = MAX_CREDIT;
+                        }
+                        totalCourseAdvised -= 1;
+                        totalCreditAdvised -= advitem.courseCredit;
+                        $('#clist' + advitem.courseCode + "" + advitem.section).css("background", eval("color" + 0));
+                        advisedArray.splice(i, 1);
+                        delete_second_course = 0; //CODE FOR AMC
+                        break;
+                    }
+                }
+
+                var url = sitePath + "/students/advising/deleteCourseEventLog/";
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: "course=" + course + "&section=" + section
+                });
+
+                //CODE START FOR AMC
+                for (var i = 1; i < advisedArray.length; i++)
+                {
+                    var advitem = advisedArray[i];
+                    //  if ((advitem.courseCode == course + 'L' && advitem.section == section) || (advitem.courseCode == course.substring(0, course.length - 1) && advitem.section == section)) {
+                    //  delete_second_course = 1;
+                    //  removeCourse(advitem.courseCode, advitem.section);
+                    //   }
+                }
+                //CODE END FOR AMC
+
+                displaySlip();
+
+                /*Swal.fire(
+                    'Removed!',
+                    'Your course has been removed.',
+                    'success'
+                )*/
+            }
+        });
+    }
+    else
+        var conf = true;
+
+    //CODE END FOR AMC
+
+    if (conf) {
+
+        var advCourses = advisedArray.length;
+
+        for (var i = 1; i < advCourses; i++)
+        {
+            var advitem = advisedArray[i];
+            if (advitem.courseCode == course) {
+
+                if (checkIfSpecialCourse(course)) {
+                    maxCreditAllowed = MAX_CREDIT;
+                }
+                totalCourseAdvised -= 1;
+                totalCreditAdvised -= advitem.courseCredit;
+                $('#clist' + advitem.courseCode + "" + advitem.section).css("background", eval("color" + 0));
+                advisedArray.splice(i, 1);
+                delete_second_course = 0; //CODE FOR AMC
+                break;
+            }
+        }
+        var url = sitePath + "/students/advising/deleteCourseEventLog/";
+
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: "course=" + course + "&section=" + section
+        });
+
+        //CODE START FOR AMC
+        for (var i = 1; i < advisedArray.length; i++)
+        {
+            var advitem = advisedArray[i];
+            //  if ((advitem.courseCode == course + 'L' && advitem.section == section) || (advitem.courseCode == course.substring(0, course.length - 1) && advitem.section == section)) {
+            //  delete_second_course = 1;
+            //  removeCourse(advitem.courseCode, advitem.section);
+            //   }
+        }
+        //CODE END FOR AMC
+
+        displaySlip();
+
+    }
+
+    return false;
+
+};
+
+
+checkIfSpecialCourse = function (courseCode) {
+    var spcCourses = specialCourses.length;
+    for (var j = 1; j < spcCourses; j++) {
+        if (courseCode == specialCourses[j].courseCode) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+addCourses = function (ind) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    if (!studentInfoLoaded) {
+        nsuAlert("Please enter student ID to load student information before starting the advising.");
+        return false;
+    }
+
+
+
+    var item = courseArray[ind];
+
+    //alert(item.status);
+
+    if (item.status == 0) {
+
+        if (maxCourseAllowed <= totalCourseAdvised || maxCreditAllowed <= totalCreditAdvised) {
+            nsuAlert("You can not advise more than " + maxCourseAllowed + " courses or " + maxCreditAllowed + " credits.");
+            return false;
+        }
+
+        var advCourses = advisedArray.length;
+        for (var i = 1; i < advCourses; i++)
+        {
+            var advitem = advisedArray[i];
+            if (item.timeID == advitem.timeID && item.timeID > 0 && item.courseCode != advitem.courseCode) {
+                nsuAlert("This course time clashes with : " + advitem.courseCode + "." + advitem.section);
+                return false;
+            } else if (item.courseCode == advitem.courseCode) {
+                var tind = findCourseIndex(advitem.courseCode + "" + advitem.section);
+                courseArray[tind].status = advitem.status;
+                totalCourseAdvised -= 1;
+                totalCreditAdvised -= advitem.courseCredit;
+                $('#clist' + advitem.courseCode + "" + advitem.section).css("background", eval("color" + courseArray[tind].status));
+                advisedArray.splice(i, 1);
+                doingAdvising = true;
+                break;
+            }
+        }
+        var tAdv = new advisedObj(item.courseTitle, item.courseCode, item.section, item.courseCredit, item.timeID, item.fees, item.finalExamStart, item.finalExamEnd, item.status);
+        advisedArray.push(tAdv);
+        totalCourseAdvised += 1;
+        totalCreditAdvised += item.courseCredit;
+        courseArray[ind].status = 3;
+        $('#clist' + item.courseCode + "" + item.section).css("background", eval("color" + 3));
+        doingAdvising = true;
+
+    } else if (item.status == 1) {
+        nsuAlert(" This section is full. ");
+        return false;
+    } else if (item.status == 2) {
+
+        //alert("here");
+
+        if (canAddCourseWOPrereq) {
+
+            if (maxCourseAllowed <= totalCourseAdvised || maxCreditAllowed <= totalCreditAdvised) {
+                nsuAlert("You can not advise more than " + maxCourseAllowed + " courses or " + maxCreditAllowed + " credits.");
+                return false;
+            }
+
+            var advCourses = advisedArray.length;
+            for (var i = 1; i < advCourses; i++)
+            {
+                var advitem = advisedArray[i];
+                if (timeID == advitem.timeID && timeID > 0 && courseCode != advitem.courseCode) {
+                    nsuAlert("This course time clashes with : " + advitem.courseCode + "." + advitem.section);
+                    return false;
+                } else if (courseCode == advitem.courseCode) {
+                    //var tind = advitem.cindex;
+                    //courseArray[tind].status = advitem.status;
+                    totalCourseAdvised -= 1;
+                    totalCreditAdvised -= advitem.courseCredit;
+                    $('#clist' + advitem.courseCode + "" + advitem.section).css("background", eval("color0"));
+                    advisedArray.splice(i, 1);
+                    doingAdvising = true;
+                    break;
+                }
+            }
+            var tAdv = new advisedObj(courseTitle, courseCode, section, courseCredit, timeID, courseFee, finalExamStart, finalExamEnd, status);
+            advisedArray.push(tAdv);
+            totalCourseAdvised += 1;
+            totalCreditAdvised += courseCredit;
+            //courseArray[ind].status = 3;
+            $('#clist' + courseCode + "" + section).css("background", eval("color" + 3));
+            doingAdvising = true;
+
+
+        } else {
+            nsuAlert("Required Prerequisite courses are not done for this course.");
+            // also show which courses are not done.
+            return false;
+        }
+
+    } else if (item.status == 3) {
+        var advCourses = advisedArray.length;
+        for (var i = 1; i < advCourses; i++)
+        {
+            var advitem = advisedArray[i];
+
+            if (item.courseCode == advitem.courseCode && item.section == advitem.section) {
+                courseArray[ind].status = advitem.status;
+                totalCourseAdvised -= 1;
+                totalCreditAdvised -= advitem.courseCredit;
+                $('#clist' + item.courseCode + "" + item.section).css("background", eval("color" + courseArray[ind].status));
+                advisedArray.splice(i, 1);
+                doingAdvising = true;
+                break;
+            }
+
+        }
+    } else if (item.status == 4) {
+        nsuAlert(" You have completed this course already or Incomplete");
+        return false;
+    }
+
+    displaySlip();
+};
+
+//CODE START FOR AMC
+addTwoNewCourses = function (courseCode, courseTitle, courseCredit, courseFee, section, roomID, timeID, faculty, totalSeat, takenSeat, status, finalExamStart, finalExamEnd, LcourseCode, LcourseTitle, LcourseCredit, LcourseFee, Lsection, LroomID, LtimeID, Lfaculty, LtotalSeat, LtakenSeat, Lstatus, LfinalExamStart, LfinalExamEnd) {
+
+    var a = addNewCourses(courseCode, courseTitle, courseCredit, courseFee, section, roomID, timeID, faculty, totalSeat, takenSeat, status, finalExamStart, finalExamEnd);
+    if (a != false)
+        var b = addNewCourses(LcourseCode, LcourseTitle, LcourseCredit, LcourseFee, Lsection, LroomID, LtimeID, Lfaculty, LtotalSeat, LtakenSeat, Lstatus, LfinalExamStart, LfinalExamEnd);
+    if (b == false) {
+        delete_second_course = 1;
+        removeCourse(courseCode, section);
+        for (var i = 1; i < advisedArray.length; i++)
+        {
+            var advitem = advisedArray[i];
+            if (advitem.courseCode == courseCode + 'L' || advitem.courseCode == courseCode.substring(0, courseCode.length - 1)) {
+                delete_second_course = 1;
+                removeCourse(advitem.courseCode, advitem.section);
+            }
+        }
+    }
+};
+//CODE END FOR AMC
+getSpecialPrerequisiteRule = function (courseCode) {
+
+    if (STUDENT_BATCH <= 142) {
+        switch (courseCode) {
+            case 'ACT310' :
+            case 'ACT320' :
+            case 'ACT410' :
+            case 'ACT460' :
+                return false;
+                break;
+
+
+            default :
+                return true;
+        }
+    }
+
+    if (STUDENT_BATCH > 142) {
+        switch (courseCode) {
+            case 'ACT330' :
+                return false;
+                break;
+
+            default :
+                return true;
+        }
+    }
+
+
+};
+addNewCourses = function (courseCode, courseTitle, courseCredit, courseFee, section, roomID, timeID, faculty, totalSeat, takenSeat, status, finalExamStart, finalExamEnd) { // final exam can be done in one variable. keep in mind
+
+
+
+
+    if(dropDisabled =='1' && sectionChangeDisabled =='1') {
+        nsuAlert("No drop or section change is allowed once the course is saved. Use Discard Changes button to remove the course before save");
+    }else if(dropDisabled =='1' && sectionChangeDisabled =='0'){
+        nsuAlert("No drop is allowed once the course is saved. But You can change the section.");
+    }
+
+//    var restrictRetakeLength = restrictRetake.length;
+//
+//    for(var i=1;i<restrictRetakeLength;i++){
+//         if(courseCode == restrictRetake[i].courseCode)
+//        status =5 ;
+//      }
+//
+    //Start Blocking 27 and 26 program of 161 to 171
+    /* if (STUDENT_BATCH === '161' || STUDENT_BATCH === '162' || STUDENT_BATCH === '163' || STUDENT_BATCH === '171') {
+         if (STUDENT_PROGRAM === '26' || STUDENT_PROGRAM === '27') {
+             switch (courseCode) {
+                 case 'ENV403':
+                 case 'ENV404':
+                 case 'ENV405':
+                 case 'ENV409':
+                 case 'ENV410':
+                 case 'ENV418':
+                 case 'ENV419':
+                 case 'ENV455':
+                 case 'ENV495':
+                 case 'ENV498':
+                 case 'ENV499':
+                     status = 8;
+                     break;
+                 default :
+                     break;
+             }
+         }
+     } */
+
+    //Checking Validation for Student CourseCredit and Fees less or equal 143
+//    if (STUDENT_BATCH > '143') {
+//        switch (courseCode) {
+//            case "EEE312L":
+//            case "CSE225L":
+//                courseCredit = 0;
+//                courseFee = 0;
+//                break;
+//        }
+//
+//    }
+    //Checking Validation for Student CourseCredit and Fees less or equal 143
+//    if (STUDENT_BATCH < '143') {
+//        switch (courseCode) {
+//            case "EEE241L":
+//            case "ETE241L":
+//            case "ETE311L":
+//            case "EEE311L":
+//            case "EEE342L":
+//            case "EEE363L":
+//            case "ETE424L":
+//            case "ETE426L":
+//                courseCredit = 0;
+//                courseFee = 0;
+//                break;
+//        }
+//    }
+
+    if ((STUDENT_PROGRAM === "40" || STUDENT_PROGRAM === "42" || STUDENT_PROGRAM === "43" ||
+        STUDENT_PROGRAM === "44" || STUDENT_PROGRAM === "45" || STUDENT_PROGRAM === "50" ||
+        STUDENT_PROGRAM === "52" || STUDENT_PROGRAM === "56") && courseCode == "CEE110") {
+        nsuAlert("Please Take EEE154 Instead of CEE110 ")
+        return false;
+    }
+
+
+    //end
+    var restrictRetake1Length = restrictRetake1.length;
+
+    //Code for Restrict Retake  Category - Other
+    var listOfGrades = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "W"];
+
+    for (var i = 1; i < restrictRetake1Length; i++) {
+        var temp = new Array();
+        var count = 0;
+        var countFail = 0;
+        var countFailAndPass = 0;
+        var countSingleFail = 0;
+        var countSinglePass = 0;
+        temp = restrictRetake1[i].takenCount.split(",");
+        for (grade in temp) {
+            if (listOfGrades.indexOf(temp[grade]) >= 0 && courseCode == restrictRetake1[i].courseCode) {
+
+                if (temp[grade] != "W") {
+                    count++;
+                }
+            }
+//            if (count >= 2) {
+//                status = 6;
+//            }
+
+            if (temp[grade] == "F" && courseCode == restrictRetake1[i].courseCode) {
+                countFail++;
+            }
+
+//            if (countFail >= 3) {
+//                status = 5;
+//            }
+            if ((courseCode == restrictRetake1[i].courseCode) || (temp[grade] == "F")) {
+                if ((courseCode == restrictRetake1[i].courseCode) && (temp[grade] == "F")) {
+                    countSingleFail++;
+                } else {
+                    if (temp[grade] != "W") {
+                        countSinglePass++;
+                    }
+                }
+                if (countSingleFail >= 1 && countSinglePass > 0) {
+                    countFailAndPass = countSingleFail + countSinglePass;
+                }
+            }
+            // if (countFailAndPass > 2) {
+            //     status = 7;
+            //}
+        }
+    }
+
+    // End Code for Restrict Retake Category - Other
+
+    var isSpecial = false;
+    var lastChar = courseCode.slice(-1);
+    if (lastChar === 'L' && status == 4) {
+        status = 0;
+    }
+    if (status == 0 || status == 2) {
+        // first check if this course got any special restriction
+
+        var spcCourses = specialCourses.length;
+        for (var j = 1; j < spcCourses; j++) {
+
+            //if(( courseCode == 'CSE499B'||courseCode == 'CSE499A') && Number(currentCGPA) >= Number(3.50)){
+            //    continue;
+            //}
+
+            if (courseCode == specialCourses[j].courseCode) {
+
+                isSpecial = true;
+                if (specialCourses[j].maxCredit > 0) {
+                    maxCreditAllowed = specialCourses[j].maxCredit * 1 + courseCredit * 1;
+                }
+
+                if (specialCourses[j].minCredit * 1 > 0 && specialCourses[j].minCredit * 1 > CREDIT_COMPLETED) {
+                    nsuAlert("In order to take this course you must complete " + specialCourses[j].minCredit + " credits.");
+                    maxCreditAllowed = MAX_CREDIT;
+                    return false;
+                }
+
+                if (specialCourses[j].program.length > 0 && specialCourses[j].program != STUDENT_PROGRAM) {
+                    nsuAlert("Student from program '" + specialCourses[j].program + "' can only take this course");
+                    maxCreditAllowed = MAX_CREDIT;
+                    return false;
+                }
+                if (specialCourses[j].minCGPA.length > 0 && currentCGPA < specialCourses[j].minCGPA) {
+                    nsuAlert("In order to take this course you must have CGPA " + specialCourses[j].minCGPA + " or above.");
+                    maxCreditAllowed = MAX_CREDIT;
+                    return false;
+                }
+//                alert((specialCourses[j].allowedBatches).indexOf(STUDENT_BATCH));
+                if (specialCourses[j].allowedBatches.length > 0 && (specialCourses[j].allowedBatches).indexOf(STUDENT_BATCH) < 0) {
+                    nsuAlert("Student from Batch " + specialCourses[j].allowedBatches + " only can take this course.");
+                    maxCreditAllowed = MAX_CREDIT;
+                    return false;
+                }
+//               alert(specialCourses[j].allowedStudents.split(",").length < (totalSeat - takenSeat));
+                /*if (specialCourses[j].allowedStudents.length > 0 && specialCourses[j].allowedSection.length > 0
+                    && (specialCourses[j].allowedStudents).indexOf(STUDENT_NUMBER) < 0 && (specialCourses[j].allowedSection == section)
+                    && specialCourses[j].allowedStudents.split(",").length >= (totalSeat - takenSeat)) {
+                    nsuAlert("This section has been reserved for " + specialCourses[j].allowedStudents + ".");
+                    maxCreditAllowed = MAX_CREDIT;
+                    return false;
+                }*/
+            }
+        }
+
+    }
+
+
+    if (status == 0) {
+
+        if(  (STUDENT_BATCH <150) && (courseCode == "CSE499A" || courseCode == "CSE499B" || courseCode ==  "EEE499A" || courseCode ==  "EEE499B" || courseCode ==  "ETE499A" || courseCode ==  "ETE499B"))
+        {
+            maxCreditAllowed = MAX_CREDIT;
+        }else if (courseCode == "BUS498") {
+            maxCreditAllowed = 13;
+        } else {
+            var advCourses = advisedArray.length;
+            for (var i = 1; i < advCourses; i++) {
+                var advitem = advisedArray[i];
+                if ("BUS498" == advitem.courseCode) {
+                    maxCreditAllowed = 13;
+                    break;
+                }
+            }
+        }
+
+
+        if (getSpecialPrerequisiteRule(courseCode) == false) {
+            if(courseCode == 'ACT310' || courseCode == 'ACT320' || courseCode == 'ACT410' || courseCode == 'ACT460'){
+                nsuAlert("Student from 142 or prior batch cannot advise this course  "+courseCode);
+                return false;
+            } else if(courseCode == 'ACT330'){
+                nsuAlert("Student from 143 or later batch cannot advise this course 'ACT330' ");
+                return false;
+            } else {
+                nsuAlert("You can not advise this course");
+                return false;
+            }
+        }
+
+
+
+
+        var already_there=false;
+        var advCourses = advisedArray.length;
+        for (var i = 1; i < advCourses; i++)
+
+        {
+            var advitem = advisedArray[i];
+            if ((timeID == advitem.timeID && timeID > 0 && courseCode != advitem.courseCode) || checkTimeConflict(timeID, advitem.timeID) == true) {
+                nsuAlert("This course time clashes with : " + advitem.courseCode + "." + advitem.section);
+                if (isSpecial)
+                    maxCreditAllowed = MAX_CREDIT;
+                return false;
+            } else if (courseCode == advitem.courseCode) {
+
+                //var tind = advitem.cindex;
+                //courseArray[tind].status = advitem.status;
+                already_there=true;
+
+                if (conflictsWithOther(timeID, i))
+                {
+                    return false;
+                }
+
+                totalCourseAdvised -= 1;
+                totalCreditAdvised -= advitem.courseCredit;
+                $('#clist' + advitem.courseCode + "" + advitem.section).css("background", eval("color0"));
+                advisedArray.splice(i, 1);
+                doingAdvising = true;
+                break;
+
+            }
+        }
+
+        if(already_there === false){
+            if (maxCourseAllowed <= totalCourseAdvised || maxCreditAllowed < totalCreditAdvised * 1 + courseCredit * 1) {
+                nsuAlert("You can not advise more than " + maxCourseAllowed + " courses or " + maxCreditAllowed + " credits.");
+                if (isSpecial)
+                    maxCreditAllowed = MAX_CREDIT;
+                return false;
+            }
+        }
+
+
+        var tAdv = new advisedObj(courseTitle, courseCode, section, courseCredit, timeID, courseFee, finalExamStart, finalExamEnd, status);
+        advisedArray.push(tAdv);
+        totalCourseAdvised += 1;
+        totalCreditAdvised += courseCredit;
+        //courseArray[ind].status = 3;
+        $('#clist' + courseCode + "" + section).css("background", eval("color" + 3));
+        doingAdvising = true;
+
+    } else if (status == 1) {
+        nsuAlert(" This section is full. ");
+        if (isSpecial)
+            maxCreditAllowed = MAX_CREDIT;
+        return false;
+    } else if (status == 2) {
+        showPreReqPopUp(courseCode);
+        if (isSpecial)
+            maxCreditAllowed = MAX_CREDIT;
+        //nsuAlert("Required Prerequisite courses are not done for this course."); //+getStudentPreReq(courseCode));
+        // also show which courses are not done.
+        return false;
+    } else if (status == 3) {
+        var advCourses = advisedArray.length;
+        for (var i = 1; i < advCourses; i++)
+        {
+            var advitem = advisedArray[i];
+
+            if (courseCode == advitem.courseCode && section == advitem.section) {
+                //courseArray[ind].status = advitem.status;
+                //modified on 02-1-2018
+                nsuAlert("You have already added this course");
+                return false;
+            }
+
+        }
+    } else if (status == 4) {
+        nsuAlert(" You have completed this course already or Incomplete");
+        return false;
+    }
+
+//    else if (status == 5) {
+//        nsuAlert("Course Re-Take Option is Restricted, You have Taken at least 3 times Already !");
+//        return false;
+//    } else if (status == 6) {
+//        nsuAlert("Course Re-Take Option is Restricted, Course is Taken at least 2 times Already!");
+//        return false;
+//    } else if (status == 7) {
+//        nsuAlert("Course Re-Take Option is Restricted, Course is Taken at least 2 times Already!");
+//        return false;
+//    } 
+//    
+
+    else if (status == 8) {
+        nsuAlert("You can't take ENV 400 level course . Restricted for the student batch 161 to 171 . !");
+        return false;
+    }
+    else if (status == 5) {//should be 9 add set color
+        //nsuAlertWarning("Dropped Course Re-Take Option is Restricted, You can not take self dropped courses !");
+        nsuAlertWarning("This Course is Already Dropped by the Student. So, Can't be Re Advised !");
+        return false;
+    }
+
+    displaySlip();
+}
+;
+
+
+showPreReqPopUp = function (course) {
+
+    var url = sitePath + "/students/advising/showprereq/" + $('#studentID').val() + "/" + course + "/";
+    //window.alert(url);
+    Boxy.load(url, {cache: true, closeable: true, title: 'Pre-requisites for ' + course});
+};
+
+
+conflictsWithOther = function (timeID, ind) {
+    var advCourses = advisedArray.length;
+    for (var i = 1; i < advCourses; i++)
+    {
+        var advitem = advisedArray[i];
+
+        if (ind == i) {
+            continue
+        } else if ((timeID == advitem.timeID && timeID > 0) || checkTimeConflict(timeID, advitem.timeID) == true) {
+            nsuAlert("This course time clashes with : " + advitem.courseCode + "." + advitem.section);
+            return true;
+        }
+    }
+
+    return false;
+};
+
+checkAllConflicts = function () {
+    var advCourses = advisedArray.length;
+    for (var i = 1; i < advCourses - 1; i++)
+    {
+        var advitem = advisedArray[i];
+        for (var j = i + 1; j < advCourses; j++)
+        {
+            var advitchk = advisedArray[j];
+            if ((advitchk.timeID == advitem.timeID && advitchk.timeID > 0) || checkTimeConflict(advitchk.timeID, advitem.timeID) == true) {
+                nsuAlert("Course time clashes : " + advitem.courseCode + "." + advitem.section + " with " + advitchk.courseCode + "." + advitchk.section);
+                return true;
+            }
+        }
+    }
+
+    return false;
+};
+
+checkTimeConflict = function (advTimeID, timeID) {
+
+    var times = timeConflict.length;
+    for (var i = 1; i < times; i++)
+    {
+        if (timeConflict[i].timeID == advTimeID) {
+
+            for (var j = 1; j < times; j++) {
+
+                if (timeConflict[j].timeID == timeID && i != j) {
+                    if ((timeConflict[i].startMin >= timeConflict[j].startMin && timeConflict[i].startMin <= timeConflict[j].endMin) ||
+                        (timeConflict[i].endMin >= timeConflict[j].startMin && timeConflict[i].endMin <= timeConflict[j].endMin)
+                    ) {
+                        return true;
+                    }
+                }
+            }
+
+        }
+    }
+    return false;
+};
+
+
+
+showtranscript = function () {
+    var url = sitePath + "/advising/transcript/" + $('#studentID').val();
+    Boxy.load(url, {cache: true, closeable: true, title: 'Student Unofficial Transcript: '});
+};
+
+showhelp = function () {
+    var url = sitePath + "/advising/advhelp/";
+    Boxy.load(url, {cache: true, closeable: true, title: 'Online Advising Help: '});
+};
+
+showprinter = function () {
+    var url = sitePath + "/advising/showPrinters/";
+    Boxy.load(url, {cache: true, closeable: true, title: 'Printer Setup: '});
+};
+
+refreshadv = function () {
+
+    if (doingAdvising) {
+
+        var conf = confirm("You are currently advising someone. Are you sure to refresh the page?");
+
+        if (conf) {
+            location.reload(true);
+        }
+
+
+        return false;
+
+    } else {
+        location.reload(true);
+    }
+
+};
+
+logoutadv = function () {
+
+    var conf = confirm("Are you sure to logout from the advising system?");
+    if (conf) {
+        window.close();
+    }
+};
+
+displayTranscript = function (credit, cgpa) {
+
+    var str = "<table width='100%' align='center' border='0' cellpadding='2' cellspacing='0' class='transtxt'>";
+
+
+    var totalsem = studentSemester.length;
+    for (var i = 1; i < totalsem; i++)
+    {
+
+        var sem = studentSemester[i];
+
+        str += "<tr class='header'><td colspan='3'>" + sem.semesterName + " - " + sem.semesterYear + "</td></tr>";
+        var totalSemCredit = 0;
+        var totalCourse = studentCourses.length;
+        for (var j = 1; j < totalCourse; j++)
+        {
+            var citem = studentCourses[j];
+
+            if (citem.semesterCode != sem.semesterCode)
+                continue;
+
+            str += "<tr>";
+            str += "<td class='slipcol' width='30'>" + citem.courseCode + "</td>";
+            str += "<td class='slipcol' width='200'>" + citem.courseTitle.substr(0, 35) + "...</td>";
+            str += "<td class='slipcol' width='20'>" + escape(citem.courseGrade) + "</td>";
+            str + "</tr>";
+
+        }
+
+        str += "<tr class='header'><td colspan='3'>Total: " + sem.semesterCredit + "&nbsp;Cr.&nbsp;Passed :" + sem.semesterPassCredit + "&nbsp;Cr.&nbsp;TGPA: " + sem.semesterCGPA + "</td></tr><tr><td colspan='3'>&nbsp;</td></tr>";
+
+    }
+    str += "<tr><td colspan='3'><b>Total Credits: " + credit + "</b></td></tr><tr><td colspan='3'><b>CGPA: " + cgpa + "</b></td></tr>";
+
+    str += "</table>";
+
+
+    $('#transcriptDiv').html(str);
+
+
+
+};
+
+checkMandatoryCourse = function () {
+    var advCourses = advisedArray.length;
+    if (mandatoryCourses.length == 1) {
+        return false
+    }
+    ;
+
+    var missingCourses = "";
+
+    for (var i = 1; i < mandatoryCourses.length; i++)
+    {
+        var found = 0;
+        for (var j = 1; j < advCourses; j++)
+        {
+            if (mandatoryCourses[i].courseCode == advisedArray[j].courseCode)
+            {
+                found = 1;
+                break;
+            }
+        }
+        // course not found in advising array
+        if (found == 0)
+        {
+            missingCourses = missingCourses + " " + mandatoryCourses[i].courseCode;
+        }
+    }
+
+    if (missingCourses.length > 0)
+    {
+        nsuAlert("You must advise " + missingCourses + " course(s) as you have  'F' grade(s) in those courses.");
+        return true;
+    }
+
+    return false;
+};
+
+strpos = function (haystack, needle, offset) {
+    var i = (haystack + '').indexOf(needle, (offset || 0));
+    return i === -1 ? false : i;
+}
+
+
+function compare(string1, string2) {
+    if (string1 == string2) {
+        return true;
+    }
+    return false;
+}
+
+
+
+saveadvising = function () {
+
+    var advCourses = advisedArray.length;
+    var matches = STUDENT_PROGRAM.match(/40|42|43|44|45|50|52|56|25/g);
+
+
+    var flag = true;
+    if (matches) {
+        var listRelx=[];
+        for (var j = 0; j < restrictR1.length; j++) {
+            if (Number(restrictR1[j].CGPA) >= Number(1) && (restrictR1[j].courseCode.startsWith("CSE") || restrictR1[j].courseCode.startsWith("EEE") || restrictR1[j].courseCode.startsWith("ETE") || restrictR1[j].courseCode.startsWith("CEG") || restrictR1[j].courseCode.startsWith("PHY105") || restrictR1[j].courseCode.startsWith("CEE211") || restrictR1[j].courseCode.startsWith("CEE360"))) {
+                listRelx.push(restrictR1[j].courseCode);
+            }
+        }
+
+        console.log("RELAX List ");
+        console.log(listRelx);
+        var allCSECourses = [];
+        var allCSELabs = [];
+        var needsToTakeStringTheorys="";
+        var needsToTakeStringLabs="";
+        var breakString = "";
+
+
+
+
+
+
+        var courseHasLabs = new Array("CSE115L","CSE225L","CSE231L","CSE331L","CSE332L","CSE338L","CSE413L","CSE482L","CSE414L","CSE435L","EEE111L","EEE141L","EEE211L","EEE221L","EEE232L","EEE241L","EEE311L","EEE312L","EEE321L","EEE331L","EEE332L","EEE336L","EEE342L","EEE362L","EEE363L","EEE411L","EEE413L","EEE414L","EEE426L","EEE471L","ETE111L","ETE141L","ETE211L","ETE221L","ETE241","ETE311L","ETE312L","ETE321L","ETE331L","ETE332L","ETE334L","ETE335L","ETE412L","ETE418L","ETE419L","ETE420L","ETE424L","ETE426L","ETE471L","CSE257L","CSE417L","CSE215L","CSE311L","CSE486L");
+		
+		
+		
+        var theoryCheckList = new Array("CSE115","CSE225","CSE231","CSE331","CSE332","CSE338","CSE413","CSE482","CSE414","CSE435","EEE111", "EEE141","EEE211","EEE221","EEE232","EEE241","EEE311","EEE312","EEE321","EEE331","EEE332","EEE336","EEE342","EEE362","EEE363","EEE411","EEE413","EEE414","EEE426","EEE471","ETE111","ETE141","ETE211","ETE221","ETE241","ETE311","ETE312","ETE321","ETE331","ETE332","ETE334","ETE335","ETE412","ETE418","ETE419","ETE420","ETE424","ETE426","ETE471","CSE257","CSE215","CSE311","CSE417","CSE486","CSE257");
+
+        //populate advList
+        var advList =[];
+        for (var k = 1; k < advCourses; k++)
+        {
+
+            var advitemNew = advisedArray[k];
+            if (strpos(advitemNew.courseCode, 'CSE') !== false || strpos(advitemNew.courseCode, 'CSC') !== false || strpos(advitemNew.courseCode, 'CEG') !== false || strpos(advitemNew.courseCode, 'EEE') !== false || strpos(advitemNew.courseCode, 'ETE') !== false || strpos(advitemNew.courseCode, 'PHY105') !== false || strpos(advitemNew.courseCode, 'CEE211') !== false || strpos(advitemNew.courseCode, 'CEE360') !== false) {
+
+
+
+
+
+                advList.push(advitemNew.courseCode+"|"+advitemNew.section);
+
+            }
+        }
+        console.log("Adv List");
+
+        console.log(advList);
+
+
+        //find paired course
+        var paired =[];
+        for(var l=0;l<advList.length;l++){
+            for(var m=0;m<advList.length;m++){
+                var lCode = advList[l].split("|");
+                var mCode = advList[m].split("|");
+                if((lCode[0]+"L" == mCode[0] && lCode[1] == mCode[1]) || (mCode[0]+"L" == lCode[0] && mCode[1] == lCode[1]  )){
+                    paired.push(lCode[0]+"|"+lCode[1]);
+                }
+            }
+        }
+        console.log("Paired");
+        console.log(paired);
+
+        var unpaired = arr_diff(advList, paired);
+        console.log("Unpaired");
+        console.log(unpaired);
+
+        var needToTake = [];
+
+        for (var u = 0; u < unpaired.length; u++){
+            for (var i = 1; i < advCourses; i++)
+            {
+                var advitem = advisedArray[i];
+                var uCode = unpaired[u].split("|");
+                if(advitem.courseCode == uCode[0]){
+
+                    if(courseHasLabs.includes(uCode[0]) || theoryCheckList.includes(uCode[0]))
+                    {
+                        var oppositeOfUCode="";
+                        console.log(uCode[0]);
+                        if(uCode[0].endsWith("L")){
+                            oppositeOfUCode = uCode[0].substring(0, uCode[0].length - 1);
+                        } else {
+                            oppositeOfUCode = uCode[0]+"L";
+                        }
+
+                        if(  (!listRelx.includes(uCode[0]) && !listRelx.includes(oppositeOfUCode))  || advitem.courseCredit < 1){
+                            if(advitem.courseCode.endsWith("L")){
+                                needToTake.push(advitem.courseCode+""+advitem.section);
+                            }else {
+                                needToTake.push(advitem.courseCode+"L"+advitem.section);
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+
+        console.log("Need to take : ");
+        console.log(needToTake);
+
+        for (var j = 0; j < needToTake.length; j++) {
+            flag = false;
+            needsToTakeStringTheorys=needsToTakeStringTheorys.concat(needToTake[j].replace("L","- Section : ")+"<br>");
+        }
+
+    }
+    if (!flag) {
+        if (STUDENT_PROGRAM.match(/40|42|43|44|45|50|52|56/g)) {
+            //nsuAlert("<span style='font-size:14px'>Must Take Corresponging Theory & Lab.<br><span style='color:green'>"+needsToTakeStringTheorys.substring(0,needsToTakeStringTheorys.length - 1)+breakString+needsToTakeStringLabs.substring(0,needsToTakeStringLabs.length - 1)+"</span><br>Otherwise courses will not be saved.</span>");
+            nsuAlert("<span style='font-size:14px'>Theory & Lab is paired with same section! <br><span style='color:blue'>"+needsToTakeStringTheorys+breakString+needsToTakeStringLabs+"</span><br>Please take same section for both</span>");
+        } else if (STUDENT_PROGRAM.match(/25/g)) {
+            //nsuAlert("CEE Student Must Take Same Section of Lab & Theory Course !");
+            //nsuAlert("<span style='font-size:14px'>CEE Student Must Take  Corresponding Theory & Lab.<br><span style='color:green'>"+needsToTakeStringTheorys.substring(0,needsToTakeStringTheorys.length - 1)+breakString+needsToTakeStringLabs.substring(0,needsToTakeStringLabs.length - 1)+"</span><br>Otherwise courses will not be saved.</span>");
+            nsuAlert("<span style='font-size:14px'>CEE Student Must Take Corresponging Theory & Lab !<br><span style='color:blue'>"+needsToTakeStringTheorys+breakString+needsToTakeStringLabs+"</span><br>Otherwise courses will not be saved.</span>");
+        } else {
+            //nsuAlert("You must take theory and lab of same section");
+            //nsuAlert("<span style='font-size:14px'>You must take coreresponding theory and lab<br><span style='color:green'>"+needsToTakeStringTheorys.substring(0,needsToTakeStringTheorys.length - 1)+breakString+needsToTakeStringLabs.substring(0,needsToTakeStringLabs.length - 1)+"</span><br>Otherwise courses will not be saved.</span>");
+            nsuAlert("<span style='font-size:14px'>You Must Take Corresponging Theory & Lab !<br><span style='color:blue'>"+needsToTakeStringTheorys+breakString+needsToTakeStringLabs+"</span><br>Otherwise courses will not be saved.</span>");
+        }
+        return false;
+    }
+
+
+    jQuery("#advmsg-overlay").css('display', 'block');
+    showLoading();
+    if (saving) {
+        nsuAlert("You have already clicked 'Save' button. Wait few seconds to complete the operation");
+        return false; nsuAlert("You have already clicked 'Save' button. Wait few seconds to complete the operation");
+        return false;
+    }
+
+    if (checkAllConflicts()) {
+        return false;
+    }
+
+
+    saving = true;
+    var param = "";
+
+    var advCourses = advisedArray.length;
+
+    if (advCourses == 1) {// empty advising
+
+        Boxy.ask("<h4 style=\"color:green;\">All courses will be dropped. <br/>Are you sure you want to do that ?</h4>", ['Yes', 'Cancel'],
+            function (val) {
+                if (val == 'Yes') {
+                    saving = true;
+                    for (var i = 1; i < advCourses; i++)
+                    {
+                        var advitem = advisedArray[i];
+                        param += advitem.courseCode + "," + advitem.section + "," + advitem.courseCredit + "," + advitem.fees + ";";
+                    }
+
+                    var url = sitePath + "/students/advising/saveadvising/";
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: "studentID=" + $('#studentID').val() + "&courses=" + param + "&readvising=" + $('#readvising').val(),
+                        success: function (msg) {
+
+                            var tmp = msg.split("|");
+                            if (tmp[0] == 1 || tmp[0] == "1" )  { // successfull
+
+                                Boxy.advisingconfirmation("<h4 style=\"color:green;\">Advising saved Successfully</h4>", null, {title: "Confirmation Message"});
+
+                            } else if (tmp[0] == "0" || tmp[0] == 0 ) {   // failed. could not be saved.
+
+                                Boxy.erroralert("<h4 style=\"color:red;\">An Error Occured. Try again in few minutes.</h4>", null, {title: 'Unexpected Error'});
+
+                            } else if (tmp[0] == "2" || tmp[0] == 2) {  // not all course can be given. so ask for readvise & remove those courses.
+
+                                Boxy.sectionfullmessage("<h4 style=\"color:red;\">The seat of " + tmp[1] + " is already Taken . Please try another course</h4>", null, {title: 'Error Message '});
+
+                            } else if (tmp[0] == "3" || tmp[0] == 3 ) {  // timeout
+                                Boxy.sectionfullmessage("<h4 style=\"color:red;\">Your time has expired. Please try again in next slot.</h4>", null, {title: 'Error Message '});
+                            } else if (tmp[0] == "4" || tmp[0] == 4 ) {  // timeout
+                                Boxy.sectionfullmessage("<h4 style=\"color:red;\">Invalid/Improper Student ID </h4>", null, {title: 'Error Message '});
+                            } else if (tmp[0] == "5" || tmp[0] == 5) {  // credit/course limit exceeded
+                                Boxy.sectionfullmessage("<h4 style=\"color:red;\">Your allowed credit/course limit is exceeded </h4>", null, {title: 'Error Message '});
+                            } else if (tmp[0] == "6" || tmp[0] == 6) {  // can't drop or change section
+                                Boxy.sectionfullmessage("<h4 style=\"color:red;\">Dropping is not allowed but you can change section. </h4>", null, {title: 'Error Message '});
+                            } else if (tmp[0] == "7" || tmp[0] == 7) {  // can't drop
+                                Boxy.sectionfullmessage("<h4 style=\"color:red;\">This seat has been reserved</h4>", null, {title: 'Error Message '});
+                            }else if (tmp[0] == "8" || tmp[0] == 8) {  // can't change section
+                                Boxy.sectionfullmessage("<h4 style=\"color:red;\">You are not allowed to drop or change the section</h4>", null, {title: 'Error Message '});
+                            }else if (tmp[0] == "9" || tmp[0] == 9) {  // can't Add PHR section
+                                Boxy.sectionfullmessage("<h4 style=\"color:red;\">You are not allowed to add PHR course</h4>", null, {title: 'Error Message '});
+                            }
+                        }
+                    });
+                    //hideLoading();
+                } else {
+                    window.location = sitePath + "/students/advising";
+                }
+            }, {title: "Please Confirm"}
+        );
+    } else {
+        // smm 31212014 for drops
+        for (var i = 1; i < advCourses; i++)
+        {
+            var advitem = advisedArray[i];
+            param += advitem.courseCode + "," + advitem.section + "," + advitem.courseCredit + "," + advitem.fees + ";";
+        }
+
+        if (saving) {
+	    var canvas_msg = $('#canvasMsg').attr("title");
+            var url = sitePath + "/students/advising/saveadvising/";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: "studentID=" + $('#studentID').val() + "&courses=" + param + "&readvising=" + $('#readvising').val(),
+                success: function (msg) {
+
+                    var tmp = msg.split("|");
+                    if (tmp[0] == 1 || tmp[0] == "1") { // successfull
+                        var imagepath = sitePath + "/images/confirm.png";
+                       // Boxy.advisingconfirmation("<h4 style=\"color:green;\">Advising saved Successfully</h4>", null, {title: "Confirmation Message"});
+		      Boxy.advisingconfirmation("<h4 style=\"color:green;\">Advising saved Successfully<br><span style='color: red'>"+canvas_msg+"</span></h4>", null, {title: "Confirmation Message"});
+                    } else if (tmp[0] == "0" || tmp[0] == 0) {   // failed. could not be saved. 
+
+
+                        Boxy.erroralert("<h4 style=\"color:red;\">An Error Occured. Try again in few minutes.</h4>", null, {title: 'Unexpected Error'});
+
+
+                    } else if (tmp[0] == 2 || tmp[0] == "2") {  // not all course can be given. so ask for readvise & remove those courses. 
+                        Boxy.sectionfullmessage("<h4 style=\"color:red;\">The seat of " + tmp[1] + " is already Taken . Please try another course</h4>", null, {title: 'Error Message '});
+                    } else if (tmp[0] == "3" || tmp[0] == 3) {  // timeout
+                        Boxy.sectionfullmessage("<h4 style=\"color:red;\">Your time has expired. Please try again in next slot.</h4>", null, {title: 'Error Message '});
+                    } else if (tmp[0] == "4" || tmp[0] == 4) {  // timeout
+                        Boxy.sectionfullmessage("<h4 style=\"color:red;\">Invalid/Improper Student ID </h4>", null, {title: 'Error Message '});
+                    } else if (tmp[0] == "5" || tmp[0] == 5) {  // credit/course limit exceeded
+                        Boxy.sectionfullmessage("<h4 style=\"color:red;\">Your allowed credit/course limit is exceeded </h4>", null, {title: 'Error Message '});
+                    } else if (tmp[0] == "6" || tmp[0] == 6) {  // can't drop or change section
+                        Boxy.sectionfullmessage("<h4 style=\"color:red;\">Dropping is not allowed but you can change section.</h4>", null, {title: 'Error Message '});
+                    }else if (tmp[0] == "7" || tmp[0] == 7) {  // can't drop
+                        Boxy.sectionfullmessage("<h4 style=\"color:red;\">This seat has been reserved</h4>", null, {title: 'Error Message '});
+                    }else if (tmp[0] == "8" || tmp[0] == 8) {  // can't change section
+                        Boxy.sectionfullmessage("<h4 style=\"color:red;\">You are not allowed to drop or change the section</h4>", null, {title: 'Error Message '});
+                    }else if (tmp[0] == "9" || tmp[0] == 9) {  // can't Add PHR section
+                        Boxy.sectionfullmessage("<h4 style=\"color:red;\">You are not allowed to add PHR course</h4>", null, {title: 'Error Message '});
+                    }
+                }
+            });
+        }
+    }
+};
+
+arr_diff =function(a1, a2) {
+
+    var a = [], diff = [];
+
+    for (var i = 0; i < a1.length; i++) {
+        a[a1[i]] = true;
+    }
+
+    for (var i = 0; i < a2.length; i++) {
+        if (a[a2[i]]) {
+            delete a[a2[i]];
+        } else {
+            a[a2[i]] = true;
+        }
+    }
+
+    for (var k in a) {
+        diff.push(k);
+    }
+
+    return diff;
+};
+
+
+displaySlip = function () {
+    //window.alert(semesterName);
+    var str = "<center><b>" + semesterName + "</b><br /><br /><table width='630' align='center' border='0' cellpadding='3' cellspacing='0' class='slip'>";
+    str += "<tr class='header'><td>Saved</td><td>Course</td><td>Credit</td><td>Time</td><td align='left'>Fees</td><td></td></tr>";
+
+    var totalCredit = 0;
+    var totalFees = 0;
+
+    totalCourseAdvised = 0;
+    totalCreditAdvised = 0;
+    totalFees = 0;
+    var strCourses = "";
+    var advCourses = advisedArray.length;
+    var studentDept = $('#studentDept').val();
+    for (var i = 1; i < advCourses; i++)
+    {
+        var advitem = advisedArray[i];
+        var fee = Math.ceil(advitem.fees);
+        str += "<tr>";
+        if (advitem.status == 3) {
+            str += "<td class='slipcol saved' width='40'>&#10004;</td>";
+        } else {
+            str += "<td class='slipcol not-saved' width='40'>&nbsp;</td>";
+        }
+        str += "<td class='slipcol' width='100'>" + advitem.courseCode + "." + advitem.section + "</td>";
+        str += "<td class='slipcol' width='60'>" + advitem.courseCredit + "</td>";
+        str += "<td class='slipcol' width='240'>" + timeArray[advitem.timeID] + "</td>";
+        str += "<td class='slipcol' width='120' align='left'>" + fee + "</td>";
+        str += "<td class='slipcol' width='80' align='right'><img src='" + imagePath + "/deletesmall.png' onclick=\"removeCourse('" + advitem.courseCode + "','" + advitem.section + "')\" style='cursor:pointer'/></td>";
+        str + "</tr>";
+
+        totalCreditAdvised += advitem.courseCredit * 1;
+        totalCourseAdvised += 1;
+        totalFees += fee * 1.0;
+        strCourses += advitem.courseCode + ",";
+    }
+    str += "<tr><td colspan='6'></td></tr>";
+    for (var i = 1; i < feesArray.length; i++)
+    {
+        if (feesArray[i].course == '') { // add anyway, since no course code is mentioned
+            str += "<tr><td>&nbsp;</td><td colspan='3'>" + feesArray[i].title + "</td><td align='left'>" + feesArray[i].amount + "</td><td></td></tr>";
+            totalFees += feesArray[i].amount * 1.0;
+        } else { // check if the course is taken , then add the fees.      		    
+            var search = strCourses.search(feesArray[i].course);
+            if (search != -1) {
+                str += "<tr><td colspan='4'>" + feesArray[i].title + "</td><td align='left'>" + feesArray[i].amount + "</td><td></td></tr>";
+                totalFees += feesArray[i].amount * 1.0;
+            }
+        }
+    }
+    str += "<tr><td colspan='6'></td></tr>";
+    str += "<tr class='header'><td>Total:</td><td colspan='2'>" + totalCreditAdvised + " (credits)</td><td></td><td align='left'>" + totalFees + "</td><td></td></tr>";
+    str += "</table></center>";
+
+
+    if (advCourses > 1) {
+        reAdvising = 1;
+    }
+
+    $('#advSlip').html(str);
+
+};
+
+displayToolTip = function (courseCode, courseTitle, roomID, timeID, facultyCode) {
+
+    //var item = courseArray[ind];
+    var msg = courseCode + ": " + courseTitle;
+    msg += "<br /><br /><b>Time:</b>" + timeArray[timeID];
+    msg += "<br /><br /><b>Faculty:</b>" + facultyCode;
+
+    //msg += "<br /><br /><b>Pre-requisite Courses: <br />"+getCoursePreReq(item.courseCode);
+
+
+    //alert(ind+" > "+msg);
+
+    var x = 300;
+    var y = 100;
+
+    $('#tooltip').css('display', 'block');
+    $('#tooltiptitle').html(msg);
+    $('#tooltip').css('position', 'absolute');
+    $('#tooltip').css('text-align', 'left');
+    $('#tooltip').css('top', y);
+    $('#tooltip').css('left', x);
+    $('#tooltip').css('z-index', '300');
+
+};
+
+
+
+hideToolTip = function () {
+    //$('#tooltip').css('display','none');
+    $('#tooltip').fadeOut("slow");
+};
+
+
+
+$(document).ready(function () {
+
+
+    systemWorking = true;
+    $(function ($) {
+        var options = {
+            timeNotation: '12h',
+            am_pm: true,
+            fontSize: '14px',
+            foreground: 'white'
+        }
+        //$('#clockBlock').jclock(options);
+    });
+
+
+    $('#searchText').focus();
+});
+
+
+$(document).ready(function () {
+    $('.searchText').bind('keypress', function (e) {
+        if (e.keyCode == 13) {
+            takeToCourse();
+        }
+    });
+
+    $('.searchText').bind('keyup', function (e) {
+        takeToCourse();
+    });
+});
+

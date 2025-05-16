@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NSU Advising Assistant</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>NSU Advising Assistant</h1>
+    
+    <div id="courseEntries">
+      <!-- Course entries with pre-filled values -->
+      <div class="course-entry">
+        <div class="close-btn">×</div>
+        <div class="input-row">
+          <div class="input-group">
+            <input type="text" class="course-code" placeholder="Course Code" value="CSE331">
+          </div>
+          <div class="input-group">
+            <input type="text" class="section-numbers" placeholder="Sections (e.g. 1,2,3)" value="2">
+          </div>
+        </div>
+      </div>
+      <div class="course-entry">
+        <div class="close-btn">×</div>
+        <div class="input-row">
+          <div class="input-group">
+            <input type="text" class="course-code" placeholder="Course Code" value="CSE323">
+          </div>
+          <div class="input-group">
+            <input type="text" class="section-numbers" placeholder="Sections (e.g. 1,2,3)" value="3">
+          </div>
+        </div>
+      </div>
+     
+    <div class="course-entry">
+        <div class="close-btn">×</div>
+        <div class="input-row">
+          <div class="input-group">
+            <input type="text" class="course-code" placeholder="Course Code" value="inb372">
+          </div>
+          <div class="input-group">
+            <input type="text" class="section-numbers" placeholder="Sections (e.g. 1,2,3)" value="9">
+          </div>
+        </div>
+      </div>
+
+    <div class="controls-row">
+      <button id="addCourseBtn" class="secondary-action">+ Add Course</button>
+      <span class="course-counter">1/4 Courses</span>
+    </div>
+
+    <div class="input-group">
+      <label for="refreshInterval">Refresh Interval (seconds):</label>
+      <input type="number" id="refreshInterval" min="3" value="3">
+    </div>
+
+    <div class="controls">
+      <button id="startBtn" class="primary">Start Monitoring</button>
+      <button id="stopBtn" class="secondary" disabled>Stop Monitoring</button>
+    </div>
+
+    <div class="status">
+      <p>Status: <span id="monitorStatus">Not monitoring</span></p>
+      <p>Last checked: <span id="lastChecked">Never</span></p>
+    </div>
+    
+    <div class="error-message" id="generalError"></div>
+
+    <div class="history">
+      <h2>Recent Activity</h2>
+      <ul id="activityLog"></ul>
+    </div>
+    
+    <div>
+      <p>Fill out the form to keep using the Extension for FREE!!</p>
+      <a class="form-link" href="https://docs.google.com/forms/d/e/1FAIpQLSdHFakx1Zp34NmQA-1F_UdAw49Op6qCBtQ3P5mvBSCvkJ2RGQ/viewform" target="_blank">
+        <button class="form-link-button">Form Link</button>
+      </a>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

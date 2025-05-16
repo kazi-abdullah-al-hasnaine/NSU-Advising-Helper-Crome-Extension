@@ -1,0 +1,20 @@
+{
+   "action": {
+      "default_popup": "popup.html"
+   },
+   "background": {
+      "service_worker": "background.js",
+      "type": "module"
+   },
+   "content_scripts": [ {
+      "js": [ "content.js" ],
+      "matches": [ "\u003Call_urls>" ]
+   } ],
+   "description": "Automated course registration monitoring system",
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4PxyoDzhNPv6qf1zEl2LhFnmaIWUyQjlZeB167j8xC+Pdbfzn5YWdDWHAQLXHxFxwAuvfKcvJjglWkDADlabOctkCNeQk7OH53lk6fGOl+Pop3t0XfiI22wAlNpt70tJBz7XDJyhVlG+yZo3orT1ByeHhFs3arbBQozShCUNOlNbHuLmoC6pk/A9Xz3J6K/+u9pLpfIiMSynSvPX0sfFWEZjLlzjn5SuNf9Z4LbJPj4Qtw4fectUVRmaPRqER/AzTPiJzFDwkLYUHzRdV1MvOyjZAewZ4EoKTeeCJTafFlJqX16qL7XUEcm/KFqsI+nQv6fgEzcx+t0/oTX0SLnu+QIDAQAB",
+   "manifest_version": 3,
+   "name": "NSU Advising Assistant",
+   "permissions": [ "activeTab", "notifications", "scripting" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "1.0"
+}

@@ -1,0 +1,947 @@
+body {
+    background-color:#f0f0e0;
+    font-family: verdana,tahoma,arial,sans-serif;
+    font-size:11px;
+    margin:0px;
+    padding:0px;
+    text-align:center;
+}
+
+img{
+    border: 0px;
+}
+
+a{
+    text-decoration:none;
+    cursor: pointer;
+}
+
+
+
+#bigcontainer {
+    width: 99.9%;
+}
+
+#mainBody{
+    border: 1px solid #f0f0f0;
+    margin-left: auto ;
+    margin-right: auto ;
+    width: 950px;
+    background-color: #ffffff;
+    text-align:left;
+}
+#mainBodyStudent{
+    border: 1px solid #f0f0f0;
+    margin-left: auto ;
+    margin-right: auto ;
+    background-color: #ffffff;
+    text-align:left;
+}
+div.mainBody {
+    border: 1px solid #f0f0f0;
+    margin-left: auto ;
+    margin-right: auto ;
+    width: 950px;
+    background-color: #ffffff;
+}
+
+#separator {
+    clear: both;
+}
+
+#topspace {
+    height:0px !important;
+    width:100%;
+}
+
+#topbar {
+    width: 99%;
+    background: url("../images/buttonbg-hover.gif") repeat;
+    height: 42px;
+    border: 0px;
+    margin: 0px 5px 0px;
+    -moz-border-radius-bottomleft: 10px;
+    -moz-border-radius-bottomright: 10px;
+}
+
+
+#topbar .body{
+    float: left;
+    padding: 0px 10px;
+}
+
+#noticebar {
+    width: 99%;
+    background: #B9D2ED;
+    height: 40px;
+    border: 0px;
+    margin: 5px 5px 0px;
+    -moz-border-radius: 5px;
+}
+
+#noticebar .body{
+    float: left;
+    padding: 4px;
+}
+
+
+#advisingframe {
+    width: 940px;
+    height: 580px;
+    border: 0px;
+    margin: 0px;
+    clear: both;
+}
+
+#advisingframe .left {
+    width: 670px;
+    float: left;
+}
+
+#hseparator {
+    width: 5px;
+    height: 100%;
+    float: left;
+}
+
+#advisingframe .right {
+    width: 270px;
+    float: right;
+}
+
+#bottombar {
+    width: 99%;
+    background: url("../images/buttonbg-hover.gif") repeat;
+    height: 42px;
+    border: 0px;
+    margin: 5px 5px 0px;
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+}
+
+#bottombar .body{
+    float: left;
+    padding: 4px;
+}
+
+
+#transcriptbox {
+    width: 99%;
+    height: 260px;
+    background: #F6F6F6 none repeat scroll 0 0;
+    margin: 5px;
+    border: 1px solid #CCCCCC;
+    -moz-border-radius: 5px;
+    padding: 0px;
+}
+
+
+
+#transcriptDiv{
+    width: 340px;
+    height: 220px;
+    margin-top:10px;
+    border: 0px solid #000;
+    float:left;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+#graphDiv{
+    width: 295px;
+    height: 220px;
+    border: 0px solid #000;
+    float:  right;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+
+
+#transcriptmiddlebar{
+    width: 100%;
+    border: 0px;
+    margin: 0px;
+}
+
+#transcriptmiddlebar .body{
+    float: left;
+    width: 640px;
+    height: 234px;
+    overflow: auto;
+    padding: 10px;
+}
+
+
+
+#coursesbox {
+    width: 99%;
+    height: 527px;
+    border: 1px solid #ccc;
+    -moz-border-radius: 5px;
+    background: #EAEBEB none repeat scroll 0 0;
+    margin: 5px;
+}
+
+
+#coursemiddlebar{
+    width: 100%;
+    height: 505px;
+    border: 0px;
+    margin: 0px;
+}
+
+#coursemiddlebar .body{
+    float: left;
+    width: 250px;
+    height: 505px;
+    margin: 10px 5px;
+}
+
+
+.courselist {
+    padding: 2px 2px 2px 10px;
+    margin:0px;
+    border: 0px;
+    align: center;
+    cellpadding:0;
+    cellspacing:0;
+}
+
+.courselist td{
+    line-height: 23px;
+    border-bottom: 1px solid #d0d0d0;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0px;
+}
+
+#offeredCourses {
+    overflow: auto;
+}
+
+.biginput{
+    border: 1px solid #f0f0f0;
+    height: 21px;
+    width: 150px;
+    -moz-border-radius: 3px;
+}
+
+.searchText {
+    border: 1px solid #343434;
+    height: 22px;
+    width: 220px;
+    float: right;
+    -moz-border-radius: 4px;
+}
+
+.bigwhite {
+    font-size: 15px;
+    color:white;
+    font-weight:bold;
+}
+
+.smallicon{
+    vertical-align: middle;
+    border: 0px;
+}
+
+#topinput {
+    width: 400px;
+    float: left;
+    padding: 5px;
+}
+
+#topclock {
+    width: 160px;
+    float: left;
+    padding: 12px 2px 2px 22px;
+    font-weight:bold;
+}
+
+#topicons {
+    width: 195px;
+    float: left;
+    padding-top: 4px;
+}
+
+
+
+.header{
+    font-weight:bold;
+    background: #EAEBEB;
+}
+
+.slip{
+    font-size: 14px;
+}
+
+.slip td{
+    font-size: 12px;
+}
+
+.slipcol {
+    border-bottom: 1px solid #EAEBEB;
+}
+
+.label0 {
+    color: #EAEBEB;
+}
+
+.label1 {
+    color: #F4071D;
+}
+
+.label2 {
+    color: #6C8AD6;
+}
+
+.label3 {
+    color3:#E3F454;
+}
+
+.countdown_amount {
+    color: #fff;
+    font-size: 14px;
+}
+
+#studentInfo {
+    width: 620px;
+    float: left;
+    height: 20px;
+    padding: 5px;
+    color : #000;
+    font-size: 14px;
+    font-weight: bold;
+    overflow:hidden;
+}
+
+#warningMsg {
+    width: 620px;
+    float: left;
+    height: 20px;
+    padding: 5px;
+    color : red;
+    font-size: 16px;
+    z-index:100;
+    position: fixed;
+    text-align:center;
+    font-weight: bold;
+}
+
+#searchDiv {
+    width: 230px;
+    float: left;
+    margin-left: 40px;
+    height: 20px;
+    padding: 5px;
+    color : red;
+    font-size: 16px;
+}
+
+#studentName {
+    width: 450px;
+    float: left;
+}
+
+#crcgpa{
+    width: 150px;
+    float: left;
+}
+
+#legendbox{
+    position: relative;
+    left: 8px;
+    height: 35px;
+    overflow: hidden;
+}
+
+#advButtons {
+    width: 630px;
+    top: -6px;
+    left: 8px;
+    height: 38px;
+    overflow: hidden;
+    margin-left: 17px;
+}
+
+.transtxt td{
+    font-size: 10px;
+}
+
+.cstat0{
+    background: #EAEBEB;
+    text-decoration: none;
+}
+
+.cstat1{
+    background: #F4071D;
+    text-decoration: line-through;
+}
+
+.cstat2{
+    background: #6C8AD6;
+    text-decoration: none;
+}
+
+.cstat3{
+    background: #E3F454;
+    text-decoration: none;
+}
+
+.cstat4{
+    background: #91F8A0;
+    text-decoration: none;
+}
+.cstat5{
+    background: #008ACB;
+    text-decoration: none;
+}
+
+
+#onlineUser {
+    width:150px;
+    border: 0px solid #f0f0f0;
+    float: left;
+    height: 20px;
+    margin-top: 7px;
+    color: #f0f0f0;
+    padding:3px;
+}
+
+#totalAdvCount {
+    width:150px;
+    border: 0px solid #f0f0f0;
+    float: left;
+    height: 20px;
+    margin-top: 7px;
+    color: #f0f0f0;
+    padding:3px;
+    font-weight:bold;
+}
+
+#todayCalendar {
+    width:300px;
+    border: 0px solid #f0f0f0;
+    float: left;
+    height: 20px;
+    margin-top: 7px;
+    color: #f0f0f0;
+    padding:3px;
+    font-weight:bold;
+}
+
+#bottomMenus {
+    width:260px;
+    border: 0px solid #f0f0f0;
+    float: left;
+    height: 20px;
+    margin-top: 2px;
+    color: #f0f0f0;
+    padding:0px;
+    font-weight:bold;
+    text-align: center;
+}
+
+#nsuhelp {
+    float:right;
+    width: 32px;
+    height: 32px;
+    float: right;
+    background: transparent;
+    color: red;
+    padding: 0px;
+    font-size: 14px;
+    font-weight:bold;
+    margin-right: 50px;
+    cursor: pointer;
+}
+
+#nsuPopup {
+    float:right;
+    width: 32px;
+    height: 32px;
+    float: right;
+    background: transparent url('../images/message.png') no-repeat;
+    color: red;
+    padding: 2px 5px 0px 0px;
+    font-size: 14px;
+    font-weight:bold;
+    cursor: pointer;
+}
+
+.go {
+    width: 54px;
+    height: 28px;
+    background: transparent url('../images/go.png') no-repeat;
+    border:0px;
+    position: relative;
+    top: 1px;
+    cursor: pointer;
+}
+
+.input{
+    border: 1px solid #EAEBEB;
+    height: 20px;
+    width: 200px;
+}
+
+.inputLabel {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.button {
+    border: 1px solid #000;
+    background: #6C8AD6;
+    color: #fff;
+    font-weight: bold;
+}
+
+.biginputstd{
+    border: 0px solid #f0f0f0;
+    height: 20px;
+    width: 150px;
+    background: transparent;
+    font-size: 16px;
+    font-weight:bold;
+    color: #ffffff;
+}
+
+
+#coursemiddlebarstu {
+    width: 100%;
+    background: url("../images/course-middle-bg.png");
+    height: 475px;
+    border: 0px;
+    margin: 0px;
+}
+
+#coursemiddlebarstu .left{
+    background: url("../images/course-middle-left.png") repeat-y;
+    width: 11px;
+    height: 475px;
+    float: left;
+}
+
+#coursemiddlebarstu .right{
+    background: url("../images/course-middle-right.png") repeat-y;
+    width: 18px;
+    height: 475px;
+    float: right;
+}
+
+#coursemiddlebarstu .body{
+    float: left;
+    width: 241px;
+    height: 475px;
+}
+
+#coursesboxstu {
+    width: 100%;
+    height: 510px;
+}
+
+#loadbutton {
+    text-align:center;
+    height: 35px;
+}
+
+#nsuloading {
+    margin: 0px auto;
+    position: relative;
+    top: 330px;
+    text-align: center;
+}
+
+#tooltip {
+    display:none;
+    width:300;
+    height:120;
+    background:#60BEE9;
+    color:#000;
+    border:1px solid #ccc;
+    font-size:11px;
+    opacity:0.95;
+    padding:10px;
+    overflow: visible;
+    text-align:left;
+    -moz-border-radius: 5px;
+}
+
+#tooltiptitle {
+    font-weight: bold;
+
+}
+
+#nsupop {
+    display:none;
+    width:200;
+    height:300;
+    background:#60BEE9;
+    color:#000;
+    border:1px solid #f0f0f0;
+    font-size:12px;
+    opacity:0.95;
+    padding:10px;
+    text-align:left;
+}
+
+#popuptitle {
+    font-weight: bold;
+    position:relative;
+    right:5px;
+    clear:both;
+    float: right;
+}
+
+.inputText {
+    border: 1px solid #EAEBEB;
+    height: 20px;
+    width: 200px;
+}
+
+/* CSS for Outer Search Grid (sort Orders ) created by Mahmud */
+#OuterSearchDiv {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    /* margin-left: 250px; */
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 850px;
+}
+#outerSearchMainDiv {
+    font-family: Arial,verdana;
+    margin-left:50px;
+    margin-top:15px;
+    margin-bottom: 15px;
+    font-size: 10px;
+    text-align: center;
+    border: 0px solid GREY;
+}
+#outerSearchTableDiv {
+    border: 1px solid GREY;
+    width: 250px; 
+    padding-top: 5px;
+    padding-bottom: 10px;
+    /*padding-left: 125px; */
+}
+#outerTable {
+    width: 840px;
+}
+#sortDiv {
+    /*padding-right: 155px;*/
+    width:245px; 
+    border: 1px solid  GREY;
+    padding-top: 5px;
+    padding-bottom: 10px;
+    /* margin-left: 200px; */
+    /* text-align: center; */
+}
+#sortRow td{
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+.inputTitleOuterSearch {
+    font-weight: bold;
+    background-color: #A1A1A1;
+    font-size: 12px;
+    text-align: left;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px; 
+}
+#outerSearchTable {
+    text-align: center;
+}
+#flexiGridDiv {
+    border: solid 1px Black;
+    width: 850px;
+    text-align: center;
+}
+#rowAddOrder {
+    font-size: 12px; 
+    color: white; 
+    margin-top: 2px; 
+    font-weight: bold;  
+    text-align: center;
+    background-color: #A1A1A1;
+}
+.rowAddOrder {
+    background-color: #E1E1E1;
+}
+.rowAddOrder td {
+    font-size: 10px;
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+#rowAddOrder td {
+    font-size: 10px;
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+#tableSortDiv {
+    /* width: 420px; */
+    padding-left: 5px;
+}
+#tableSort {
+    font-size: 10px;
+}
+
+#tableSort .button{
+    font-size: 10px;
+}
+#searchButtonRow {
+    /*	width: 400px; */
+}
+#searchButtonCol {
+    /*	width: 400px; */
+    padding-top: 25px;
+    text-align: right;
+
+}
+.inputSelect{
+    border: 1px solid #B1B1B1;
+    font-size: 10px;
+}
+#outerSearchTable .inputSelect{
+    border: 1px solid #B1B1B1;
+    width: 100px;
+    font-size: 10px;
+}
+#sortOrderCol  .inputSelect{
+    border: 1px solid #B1B1B1;
+    width: 50px;
+    font-size: 10px;
+}
+.inputDropDownANDOR {
+    font-family: Arial,verdana;
+    font-size: 10px;
+    font-weight: bold;
+    width: 50px;
+}
+
+/* End CSS for Search Grid (sort Orders ) created by Mahmud */
+
+
+.tableInput p{
+    color: red;
+    font-size: 11px;
+}
+
+.formtable {
+    font-size: 12px;
+}
+
+.formtable td {
+    padding: 5px;
+    vertical-align: top;
+}
+
+#flex1 td {
+    font-size: 12px;
+}
+
+.hDivBox table{
+    font-size: 12px;
+}
+
+.nDiv table{
+    font-size: 12px;
+}
+
+#flexGrid td {
+    font-size: 12px;
+}
+
+.inputLabelx {
+    font-size: 13px;
+}
+#searchButtonDiv {
+    margin-top: 20px;
+    margin-left: 612px;
+}
+#mainDiv {
+    margin-bottom: 20px;
+}
+#departmentRoomsTimesFormTable .inputDropDown {
+    width: 250px;
+    font-size: 12px;
+}
+#errorMessage {
+    color: RED;
+    font-weight: bold;
+    width: 300px;
+    margin-left: 130px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+#errorDiv {
+    text-align: center;
+    width: 550px;
+    margin-left: 200px;
+    margin-right: 200px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    background-color: #B1B1B1;
+}
+.inputGridCol {
+    padding: 2px 10px 2px 10px;
+    border: 0px solid   #000000;
+}
+#semesterCourseTableView {
+    border: 1px solid   #000000;
+}
+#outerSearchTable .inputTextStudent {
+    width: 100px;
+    font-size: 10px;
+}
+#outerSearchTable .inputLabelOuterSearch {
+    text-align: right;
+    padding-right: 5px;
+    font-size: 10px;
+    font-weight: normal;
+}
+#outerSearchTable .inputColOuterSearch {
+    text-align: left;
+    padding-left: 5px;
+    font-size: 10px;
+    font-weight: normal;
+}
+#outerSearchFieldset {
+    background-color: #E1E1E1;
+    width: 400px;
+}
+#outerSearchFieldset legend{
+    margin-top:15px;
+    color: WHITE;
+    font-family: Arial,verdana;
+    background-color: #A1A1A1;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+#facultyColHead {
+    width: 100px;
+}
+
+textarea {
+    border: 1px solid #c4c4c4;
+}
+
+.inputTextCal {
+    border: 1px solid #EAEBEB;
+    height: 20px;
+    width: 185px;
+}
+.inputSelectCal{
+    border: 1px solid #B1B1B1;
+    width: 150px;
+    font-size: 10px;
+}
+
+
+.inputLabelx {
+    font-size: 13px;
+}
+#searchButtonDiv {
+    margin-top: 20px;
+    margin-left: 612px;
+}
+
+textarea {
+    border: 1px solid #c4c4c4;
+}
+
+.advlink {
+    font-size: 14px;
+    font-weight: bold;
+    color: WHITE;
+}
+
+.thead {
+    background: #f0f0f0;
+    font-weight: bold;
+    color: #000;
+    font-size: 12px;
+}
+
+.trows {
+    color: #000;
+    font-size: 12px;
+    border-bottom: 1px solid #c4c4c4;
+}
+
+a.blackx {
+    color: #000;
+    text-decoration: underline;
+}
+
+.abouticon {
+    width: 16px;
+    height: 16px;
+    background: url('../images/about.png') no-repeat;
+    display: block;
+}
+td.saved{
+    color: #1E90FF;
+    font-size: 16px;
+    font-weight: bold;
+    text-align:center;
+}
+td.not-saved{
+    color: #FF6600;
+    font-size: 16px;
+    font-weight: bold;
+    text-align:center;
+}
+td.saved,td.not-saved{
+    border-right:2px solid #e1e1e1;
+    border-left:2px solid #e1e1e1;
+}
+.advmsg-overlay {
+    position: absolute;
+    background: rgba(0,0,0,.9);
+    left: 0;
+    top: 0;
+    z-index: 1337;
+    display:none;
+    width: 100%;
+    height: 100%;
+}
+.advmsg-overlay #waiting{
+ margin-top:80px;   
+}
+#waiting .countdown_amount {
+	font-size:20px;
+	font-weight:bold;
+	color:#fff;
+	line-height:22px;
+}
+.advmsg-overlay img{
+ margin-top:-10px;   
+}
+.boxy-inner{
+    text-align:center;
+}
+.answers input[type=button]{
+    background: #CE3E2D;
+color: #fff;
+border: none;
+padding: 5px 14px;
+box-shadow: 0px 2px 2px #000;
+border-radius: 4px;
+cursor:pointer;
+font-size:20px;
+}
+tr.border-top{
+    border-top:2px solid #000;
+}
+#courseloader {
+	display:block;
+	margin: 70px auto 0px;
+}
