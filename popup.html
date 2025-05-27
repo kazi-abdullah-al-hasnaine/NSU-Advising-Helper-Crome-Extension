@@ -1,84 +1,123 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NSU Advising Assistant</title>
   <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <div class="container">
-    <h1>NSU Advising Assistant</h1>
+    <header>
+      <h1><i class="fas fa-graduation-cap"></i> NSU Advising Assistant</h1>
+    </header>
     
-    <div id="courseEntries">
-      <!-- Course entries with pre-filled values -->
-      <div class="course-entry">
-        <div class="close-btn">×</div>
-        <div class="input-row">
-          <div class="input-group">
-            <input type="text" class="course-code" placeholder="Course Code" value="CSE331">
+    <main>
+      <div class="card" id="course-manager">
+        <div class="card-header">
+          <h2>Course Selection</h2>
+          <span class="course-counter">3/4 Courses</span>
+        </div>
+        
+        <div id="courseEntries">
+          <!-- Course entries with pre-filled values -->
+          <div class="course-entry">
+            <div class="course-content">
+              <div class="input-group">
+                <label for="course1">Course Code</label>
+                <input type="text" id="course1" class="course-code" placeholder="e.g. CSE331" value="CSE331L">
+              </div>
+              <div class="input-group">
+                <label for="section1">Section</label>
+                <input type="text" id="section1" class="section-numbers" placeholder="e.g. 1,2,3" value="2">
+              </div>
+            </div>
+            <button class="remove-btn" title="Remove course"><i class="fas fa-times"></i></button>
           </div>
-          <div class="input-group">
-            <input type="text" class="section-numbers" placeholder="Sections (e.g. 1,2,3)" value="2">
+          
+          <div class="course-entry">
+            <div class="course-content">
+              <div class="input-group">
+                <label for="course2">Course Code</label>
+                <input type="text" id="course2" class="course-code" placeholder="e.g. CSE323" value="CSE323">
+              </div>
+              <div class="input-group">
+                <label for="section2">Section</label>
+                <input type="text" id="section2" class="section-numbers" placeholder="e.g. 1,2,3" value="6">
+              </div>
+            </div>
+            <button class="remove-btn" title="Remove course"><i class="fas fa-times"></i></button>
+          </div>
+          
+          
+        
+        <button id="addCourseBtn" class="btn-add">
+          <i class="fas fa-plus"></i> Add Course
+        </button>
+      </div>
+      
+      <div class="card" id="settings">
+        <div class="card-header">
+          <h2>Settings</h2>
+        </div>
+        <div class="input-group refresh-setting">
+          <label for="refreshInterval">Refresh Interval</label>
+          <div class="input-with-unit">
+            <input type="number" id="refreshInterval" min="3" value="3">
+            <span class="unit">seconds</span>
           </div>
         </div>
-      </div>
-      <div class="course-entry">
-        <div class="close-btn">×</div>
-        <div class="input-row">
-          <div class="input-group">
-            <input type="text" class="course-code" placeholder="Course Code" value="CSE323">
-          </div>
-          <div class="input-group">
-            <input type="text" class="section-numbers" placeholder="Sections (e.g. 1,2,3)" value="3">
-          </div>
+        
+        <div class="controls">
+          <button id="startBtn" class="btn-primary">
+            <i class="fas fa-play"></i> Start Monitoring
+          </button>
+          <button id="stopBtn" class="btn-secondary" disabled>
+            <i class="fas fa-stop"></i> Stop
+          </button>
         </div>
       </div>
-     
-    <div class="course-entry">
-        <div class="close-btn">×</div>
-        <div class="input-row">
-          <div class="input-group">
-            <input type="text" class="course-code" placeholder="Course Code" value="inb372">
+      
+      <div class="card" id="status-card">
+        <div class="card-header">
+          <h2>Status</h2>
+        </div>
+        <div class="status-info">
+          <div class="status-item">
+            <span class="status-label"><i class="fas fa-circle-info"></i> Status:</span>
+            <span id="monitorStatus" class="status-idle">Not monitoring</span>
           </div>
-          <div class="input-group">
-            <input type="text" class="section-numbers" placeholder="Sections (e.g. 1,2,3)" value="9">
+          <div class="status-item">
+            <span class="status-label"><i class="fas fa-clock"></i> Last checked:</span>
+            <span id="lastChecked">Never</span>
           </div>
         </div>
+        <div class="error-message" id="generalError"></div>
       </div>
-
-    <div class="controls-row">
-      <button id="addCourseBtn" class="secondary-action">+ Add Course</button>
-      <span class="course-counter">1/4 Courses</span>
-    </div>
-
-    <div class="input-group">
-      <label for="refreshInterval">Refresh Interval (seconds):</label>
-      <input type="number" id="refreshInterval" min="3" value="3">
-    </div>
-
-    <div class="controls">
-      <button id="startBtn" class="primary">Start Monitoring</button>
-      <button id="stopBtn" class="secondary" disabled>Stop Monitoring</button>
-    </div>
-
-    <div class="status">
-      <p>Status: <span id="monitorStatus">Not monitoring</span></p>
-      <p>Last checked: <span id="lastChecked">Never</span></p>
-    </div>
+      
+      <div class="card" id="activity">
+        <div class="card-header">
+          <h2><i class="fas fa-history"></i> Recent Activity</h2>
+        </div>
+        <ul id="activityLog" class="activity-list">
+          <!-- Activity logs will be added dynamically -->
+        </ul>
+      </div>
+    </main>
     
-    <div class="error-message" id="generalError"></div>
-
-    <div class="history">
-      <h2>Recent Activity</h2>
-      <ul id="activityLog"></ul>
-    </div>
-    
-    <div>
-      <p>Fill out the form to keep using the Extension for FREE!!</p>
-      <a class="form-link" href="https://docs.google.com/forms/d/e/1FAIpQLSdHFakx1Zp34NmQA-1F_UdAw49Op6qCBtQ3P5mvBSCvkJ2RGQ/viewform" target="_blank">
-        <button class="form-link-button">Form Link</button>
-      </a>
-    </div>
+    <footer>
+      <div class="feedback-card">
+        <p>Fill out the form to keep using the Extension for FREE!</p>
+        <a class="form-link" href="https://docs.google.com/forms/d/e/1FAIpQLSdHFakx1Zp34NmQA-1F_UdAw49Op6qCBtQ3P5mvBSCvkJ2RGQ/viewform" target="_blank">
+          <button class="btn-feedback">
+            <i class="fas fa-external-link-alt"></i> Open Feedback Form
+          </button>
+        </a>
+      </div>
+    </footer>
   </div>
+  
   <script src="popup.js"></script>
 </body>
 </html>
